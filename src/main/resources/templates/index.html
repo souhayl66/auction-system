@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Auction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Auction System</a>
+            <div class="d-flex">
+                <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-outline-primary me-2">Login</a>
+                <a sec:authorize="!isAuthenticated()" href="/register" class="btn btn-primary">Register</a>
+                <span sec:authorize="isAuthenticated()" class="navbar-text me-3">
+                    Welcome, <span sec:authentication="name"></span>
+                </span>
+                <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post">
+                    <button type="submit" class="btn btn-outline-danger">Logout</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mt-4">
+        <a sec:authorize="hasRole('SELLER')" href="/products/new" class="btn btn-success mb-3">Add New Product</a>
+
+        <h2>Active Auctions</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4" th:each="product : ${products}">
+                <div class="card">
+                    <img th:src="${product.imageUrl}" class="card-img-top" alt="Product Image" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${product.name}"></h5>
+                        <p class="card-text" th:text="${product.description}"></p>
+                        <p class="card-text"><strong>Current Price: $</strong><span th:text="${#numbers.formatDecimal(product.currentPrice, 1, 2)}"></span></p>
+                        <p class="card-text"><small class="text-muted">Ends:
+                            <span th:text="${#temporals.format(product.auctionEndDate, 'yyyy-MM-dd HH:mm')}"></span></small></p>
+                        <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
